@@ -15,10 +15,14 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
 
-    - name: Download UASM
+    - name: Install unzip
+      run: sudo apt-get update && sudo apt-get install -y unzip
+
+    - name: Download and install UASM
       run: |
-        curl -L -o uasm.zip https://github.com/Terraspace/UASM/releases/download/v2.72.0/uasm-2.72.0.zip
-        unzip uasm.zip -d uasm
+        mkdir uasm
+        curl -L https://www.terraspace.co.uk/downloads/uasm257_linux64.zip -o uasm/uasm.zip
+        unzip uasm/uasm.zip -d uasm
         chmod +x uasm/uasm
 
     - name: Assemble all ASM files
