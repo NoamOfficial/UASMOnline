@@ -1,0 +1,37 @@
+name: Build UASM
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Download UASM
+      run: |
+        curl -L -o uasm.zip https://github.com/Terraspace/UASM/releases/download/v2.72.0/uasm-2.72.0.zip
+        unzip uasm.zip -d uasm
+        chmod +x uasm/uasm
+
+    - name: Assemble all ASM files
+      run: |
+        mkdir -p out
+        for f in $(find . -maxdepth 1 -name "*.asm"); do
+          base=$(basename "$f" .asm)
+          echo "Assembling $f -> out/$base.bin"
+          ./uasm/uasm "$f" /bin /o out/$base.bin
+        done
+
+    - name: Upload binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: uasm-binaries
+        path: out/
